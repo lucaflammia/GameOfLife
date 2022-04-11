@@ -1,17 +1,24 @@
 require './cell'
 
-class Pattern
+class Grid
 
-  # Set the pattern for Conway'game of life
+  # Set the grid for Conway'game of life
+
+  # Es. 3 x 3 grid 
+  # cell coordinates are denoted as follows
+
+  # | (0, 0) (0, 1) (0, 2) |
+  # | (1, 0) (1, 1) (1, 2) |
+  # | (2, 0) (2, 1) (2, 2) |
 
   def initialize(opts = {})
     @width  = opts[:width] 
     @height = opts[:height]
 
-    # print the pattern
+    # let's draw the grid
     draw_grid!
-    # define live cells over the pattern
-    get_live_cells(opts[:with_alive]) if opts[:with_alive]
+    # define live cells over the grid
+    get_live_cells(opts[:live_cells]) if opts[:live_cells]
 
   end
 
@@ -41,32 +48,24 @@ class Pattern
     end
   end
 
-  # Given a M x N pattern, we seed a random amount of live cells
-  def seed!
-    Random.rand(@width * @height).times do
-      cells.sample.life!
-    end
-  end
-
   # Insert an imported initial state
-  def get_input_state
-    draw_grid!
-    get_live_cells([[1, 1], [1, 2], [1, 3]]) 
+  def get_initial_state(istate)
+    get_live_cells(istate) 
   end
 
-  # Generates the new pattern with live cells.
+  # Generates the new grid with live cells.
   def set_new_generation
     self.class.new(:height => @height, :width => @width,
-      :with_alive => new_live_cell_positions)
+      :live_cells => new_live_cell_positions)
   end
 
-  # Print the resulted pattern
+  # Print the resulted grid
   def get_visualization(iteration=0)
     system("clear")
-    print "Game of Life"
+    puts "#{@width} X #{@height} GRID"
     putc "\n"
     putc "\n"
-    print "#{@width} X #{@height} grid --- GENERATION #{iteration}"
+    print "--- GENERATION #{iteration} ---"
     putc "\n"
     putc "\n"
     @grid.each do |row|
@@ -80,11 +79,11 @@ class Pattern
       putc "\n"
     end
     puts
+    puts 'press "q<Enter>" to exit'
   end
 
-  # Returns the array of coordinates for live cells in the next generation
+  # Returns the array of coordinates for live cells in the next generation according to Conway's Game of Live rules
   def new_live_cell_positions
-    # update the 
     cells.map do |cell|
       count = get_neighbours(cell)
       if cell.alive?
@@ -95,29 +94,33 @@ class Pattern
     end.compact
   end
 
-  # Get the number of neighbours for every cell of the pattern
+  # Get the number of neighbours for every cell of the grid
   def get_neighbours(cell)
     # ------------------
-
-    # For a M x N grid, cells at the boudaries (i.e. cell(0,:), cell(M, :), cell(:, 0), cell(:, N)) 
-    # are neglected when it comes to count neighbours
-    # The eight neighbours around the selected central cell at position (i, j)
-    # are described in terms of coordinates as follows 
+    # In general, the eight neighbours are around the selected cell at position (i, j) as follows
 
     # |  + ----      +         +         +     ---- + |
     # |  + ---- (i-1, j-1) (i-1, j) (i-1, j+1) ---- + |
     # |  + ---- (i, j-1)   (i, j)    (i, j+1)  ---- + |
     # |  + ---- (i+1, j-1) (i+1, j) (i+1, j+1) ---- + |
     # |  + ----      +         +         +     ---- + |
-    
+
     # where cells at the boundaries are denoted with "+"
+    # Index i runs over the y axis
+    # Index j runs over the x axis
     # ------------------
     count = 0
 
     ((cell.x - 1)..(cell.x + 1)).each do |i|
       ((cell.y - 1)..(cell.y + 1)).each do |j|
+
+        # since i(j) runs from -1 to width(height) we ignore to count the same index twice (-1 means the last index of the array) 
+        # we skip the count evaluation for i = width 
         next if i == @width
+        # we skip the count evaluation for j = height 
         next if j == @height
+
+        # we add one unit to the neighbour evaluation when live cells around at the selected one at (i, j) are present
         count +=1 if !cell.at?(i, j)  && cell(i, j).alive?
       end
     end

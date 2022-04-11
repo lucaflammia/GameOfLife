@@ -29,7 +29,7 @@ class Cell
     @alive = true
   end
 
-  # If the cell is printed, return a character. Alive (*) dead (.)
+  # If the cell is printed, return a character. Live cell (*) - dead cell (.)
   def to_s
     alive? ? "\u{002A}" : "\u{002E}"
   end
