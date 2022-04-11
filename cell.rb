@@ -32,10 +32,4 @@ class Cell
     alive? ? "\u{002A}" : "\u{002E}"
   end
 
-  # From live cell (*) or dead cell (.) denoted with character 
-  # we set the condition with @alive parameter 
-  def from_s(s)
-    @alive = true if s == "\u{002A}" 
-  end
-
 end
