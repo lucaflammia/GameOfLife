@@ -114,8 +114,8 @@ class Board
     # |  + ----      +         +         +     ---- + |
 
     # where cells at the boundaries are denoted with "+"
-    # Index i runs over the y axis
-    # Index j runs over the x axis
+    # Index i runs over the x axis
+    # Index j runs over the y axis
     # ------------------
     count = 0
 
